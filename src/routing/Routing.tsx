@@ -14,10 +14,6 @@ const router = createBrowserRouter([
         element: <MainView />,
       },
       {
-        path: paths.mainId,
-        element: <MainView />,
-      },
-      {
         path: paths.breeds,
         element: <Breeds />,
       },

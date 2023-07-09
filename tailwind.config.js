@@ -2,6 +2,7 @@
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
+    animation: require('./src/commons/theme/animation'),
     spacing: require('./src/commons/theme/spacing'),
     inset: require('./src/commons/theme/spacing'),
     colors: require('./src/commons/theme/colors'),

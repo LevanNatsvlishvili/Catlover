@@ -29,7 +29,7 @@ export const fetchCatBreedList = async (form: CatListForm): Promise<AxiosRespons
     throw e;
   }
 };
-export const fetchCatFavoritesList = async (form: CatListForm): Promise<AxiosResponse<FavoriteCat[]>> => {
+export const fetchCatFavoritesList = async (): Promise<AxiosResponse<FavoriteCat[]>> => {
   try {
     const response = await axiosInstance.get<FavoriteCat[]>(`${api}/favourites`);
     return response;
@@ -66,6 +66,15 @@ export const addToFavorites = async (id: string): Promise<AxiosResponse> => {
   try {
     const form = { image_id: id };
     const response = await axiosInstance.post(`${api}/favourites`, form);
+    return response;
+  } catch (e: any) {
+    console.error(e);
+    throw e;
+  }
+};
+export const removeFromFavorites = async (id: string): Promise<AxiosResponse> => {
+  try {
+    const response = await axiosInstance.delete(`${api}/favourites/${id}`);
     return response;
   } catch (e: any) {
     console.error(e);

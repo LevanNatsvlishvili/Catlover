@@ -1,7 +1,7 @@
 const colors = {
   transparent: 'transparent',
   primary: '#007BFF',
-  secondary: '#6C757D',
+  secondary: '#FF6600',
   tertiary: '#FD7E14',
   white: '#fff',
 };

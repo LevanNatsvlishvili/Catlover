@@ -1,10 +1,10 @@
-import { Fragment, useCallback, useEffect, useState } from 'react';
-import { fetchCatList, fetchCat, fetchCatBreedList } from '@/services/Cats';
+import { Fragment, useEffect, useState } from 'react';
+import { fetchCatBreedList } from '@/services/Cats';
 import { Cat } from '@/types/Cat';
-import Button from '@/components/Button';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Modal from '@/components/Modal';
 import { fetchBreed } from '@/services/Cats/Cats';
+import useQuery from '@/utils/fetchQuery';
 import { paths } from '@/routing/Paths';
 
 const catListParameters = {
@@ -15,19 +15,23 @@ const catListParameters = {
 function Breeds() {
   const [breeds, setBreeds] = useState<Cat[]>([]);
   const [selectedBreed, setSelectedBreed] = useState<Cat[] | null>(null);
+  const query = useQuery();
+  const id = query.get('id');
+  console.log(id);
 
   const handleFetch = async () => {
     const res = await fetchCatBreedList(catListParameters);
     setBreeds(res.data);
   };
 
-  const handleSelectBreed = useCallback(async (catId: string) => {
+  const handleSelectBreed = async (catId: string) => {
     const res = await fetchBreed(catId);
     setSelectedBreed(res.data);
-  }, []);
+  };
 
   useEffect(() => {
     handleFetch();
+    if (id) handleSelectBreed(id);
   }, []);
 
   return (
@@ -42,13 +46,13 @@ function Breeds() {
         ))}
       </ul>
 
-      <Modal isOpen={selectedBreed ? true : false} onClose={() => setSelectedBreed(null)}>
+      <Modal url={paths.breeds} isOpen={selectedBreed ? true : false} onClose={() => setSelectedBreed(null)}>
         <p>{!!selectedBreed?.length && selectedBreed[0]['name']}</p>
         <ul className="grid grid-cols-4 gap-1-0">
           {selectedBreed?.map((breed: Cat) => (
             <Fragment key={breed.id}>
               <li>
-                <Link to={paths.main + breed.id}>
+                <Link to={`/?id=${breed.id}`}>
                   <img src={breed.url} className="max-h-15-0 object-cover w-full" />
                 </Link>
               </li>

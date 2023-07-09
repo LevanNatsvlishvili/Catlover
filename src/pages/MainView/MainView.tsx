@@ -3,8 +3,10 @@ import { fetchCatList, fetchCat, addToFavorites } from '@/services/Cats/Cats';
 import { Cat } from '@/types/Cat';
 import Button from '@/components/Button';
 import Modal from '@/components/Modal';
-import { useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import copyCatToClipboard from '@/utils/copyCatToClipboard';
+import useQuery from '@/utils/fetchQuery';
+import Spinner from '@/components/Spinner';
 
 const catListParameters = {
   has_breeds: 1,
@@ -14,7 +16,11 @@ const catListParameters = {
 function MainView() {
   const [cats, setCats] = useState<Cat[]>([]);
   const [selectedCat, setSelectedCat] = useState<Cat | null>(null);
-  const { id } = useParams();
+  const [favoritesMsg, setFavoritesMsg] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const query = useQuery();
+  const id = query.get('id');
 
   const handleFetch = async () => {
     const res = await fetchCatList(catListParameters);
@@ -30,9 +36,14 @@ function MainView() {
     setSelectedCat(res.data);
   };
   const handleAddToFavorites = async (catId: string) => {
+    setLoading((p) => !p);
     const res = await addToFavorites(catId);
     console.log(res);
-    // setSelectedCat(res.data);
+    if (res?.data?.message === 'SUCCESS') {
+      setFavoritesMsg(res?.data?.message);
+      setLoading((p) => !p);
+    }
+    console.log('first');
   };
 
   useEffect(() => {
@@ -44,10 +55,16 @@ function MainView() {
     handleFetch();
   };
 
+  const onModalClose = () => {
+    setFavoritesMsg('');
+    setSelectedCat(null);
+  };
+
   return (
     <div className="">
+      <Spinner isLoading={loading} />
       <ul className="grid grid-cols-5 gap-2-0">
-        {cats.map((cat, index) => (
+        {cats?.map((cat, index) => (
           <li key={cat.id + index}>
             <div onClick={() => handleSelectCat(cat.id)} className="h-26-0 w-full overflow-hidden">
               <img src={cat.url} className="w-full h-full object-cover" />
@@ -59,26 +76,36 @@ function MainView() {
         <Button onClick={handleLoadMore}>Load More</Button>
       </div>
 
-      <Modal url="/" isOpen={selectedCat ? true : false} onClose={() => setSelectedCat(null)}>
+      <Modal url="/" isOpen={selectedCat ? true : false} onClose={onModalClose}>
         <img src={selectedCat?.url} className="max-h-40-0" />
 
-        <ul>
-          {selectedCat?.breeds?.map((breed) => (
-            <Fragment key={breed.id}>
-              <li>
-                <span className="font-700 text-primary">Breed</span>:{breed.name}
-              </li>
-              <li>
-                <a onClick={() => copyCatToClipboard(selectedCat.id)} className="text-primary cursor-pointer">
+        {selectedCat?.breeds?.map((breed) => (
+          <Fragment key={breed.id}>
+            <div className="text-center">
+              Breed:
+              {/* Takes user to a breed page and show relevant breed cats */}
+              <Link to={`/breeds?id=${breed.id}`}>
+                <span className="font-700 text-primary"> {breed.name}</span>:
+              </Link>
+            </div>
+            <div className="flex space-x-1-0 justify-center mt-1-0">
+              <div>
+                {/* Copies cat image link to clipboard */}
+                <Button bg="secondary" onClick={() => copyCatToClipboard(`?id=${selectedCat.id}`)}>
                   Copy Link
-                </a>
-              </li>
-              <li onClick={() => handleAddToFavorites(selectedCat.id)} className="cursor-pointer">
-                Add to favorites ♡
-              </li>
-            </Fragment>
-          ))}
-        </ul>
+                </Button>
+              </div>
+              <div>
+                {/* Adds cat to favorites */}
+                {favoritesMsg ? (
+                  favoritesMsg
+                ) : (
+                  <Button onClick={() => handleAddToFavorites(selectedCat.id)}>Add to favorites ♡</Button>
+                )}
+              </div>
+            </div>
+          </Fragment>
+        ))}
       </Modal>
     </div>
   );

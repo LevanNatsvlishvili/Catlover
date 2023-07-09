@@ -1,18 +1,32 @@
-import { ReactNode, useCallback } from 'react';
-import { debounce } from 'lodash'; // lodash is a popular utility library that has a debounce function
+import { ReactNode, useState } from 'react';
+import clsx from 'clsx';
 
 interface ButtonProps {
   onClick: () => void;
   children: ReactNode;
+  full?: boolean;
+  bg?: string;
 }
 
-const Button: React.FC<ButtonProps> = ({ onClick, children }) => {
-  const debouncedOnClick = useCallback(debounce(onClick, 300), [onClick]);
+const Button: React.FC<ButtonProps> = ({ onClick, children, full, bg }) => {
+  const [isDisabled, setIsDisabled] = useState(false);
+
+  const handleClick = () => {
+    if (!isDisabled) {
+      setIsDisabled(true);
+      onClick();
+      setTimeout(() => setIsDisabled(false), 300);
+    }
+  };
 
   return (
     <button
-      className="px-1-2 flex items-center text-white rounded-1-2 h-5-0 w-fit bg-primary"
-      onClick={debouncedOnClick}
+      className={clsx(
+        `px-1-2 flex items-center justify-center text-white rounded-0-8 h-4-0 w-fit bg-primary text-1-2`,
+        full && '!w-full',
+        `!bg-${bg}`
+      )}
+      onClick={handleClick}
     >
       {children}
     </button>

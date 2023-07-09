@@ -27,7 +27,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, url }) => {
   }
 
   return (
-    <div className="fixed z-50 inset-0 overflow-y-auto flex items-center justify-center">
+    <div className="fixed z-40 inset-0 overflow-y-auto flex items-center justify-center">
       <div
         ref={ref}
         className="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all p-6-0 mt-2-4 text-2-5"
