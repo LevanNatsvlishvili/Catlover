@@ -23,12 +23,17 @@ function MainView() {
   const id = query.get('id');
 
   const handleFetch = async () => {
+    setLoading(true);
     const res = await fetchCatList(catListParameters);
-    if (!!cats.length) {
-      setCats((p) => [...p, ...res.data]);
-      return;
+    if (res?.data?.length) {
+      if (!!cats.length) {
+        setCats((p) => [...p, ...res.data]);
+        setLoading(false);
+        return;
+      }
+      setCats(res.data);
+      setLoading(false);
     }
-    setCats(res.data);
   };
 
   const handleSelectCat = async (catId: string) => {
@@ -36,14 +41,12 @@ function MainView() {
     setSelectedCat(res.data);
   };
   const handleAddToFavorites = async (catId: string) => {
-    setLoading((p) => !p);
+    setLoading(true);
     const res = await addToFavorites(catId);
-    console.log(res);
     if (res?.data?.message === 'SUCCESS') {
       setFavoritesMsg(res?.data?.message);
-      setLoading((p) => !p);
+      setLoading(false);
     }
-    console.log('first');
   };
 
   useEffect(() => {

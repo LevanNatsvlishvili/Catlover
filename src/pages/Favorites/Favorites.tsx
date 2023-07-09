@@ -9,12 +9,19 @@ function Favorites() {
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleFetch = async () => {
+    setLoading(true);
     const res = await fetchCatFavoritesList();
-    if (!!cats.length) {
-      setCats((p) => [...p, ...res.data]);
-      return;
+    if (res?.data?.length) {
+      if (!!cats.length) {
+        setCats((p) => [...p, ...res.data]);
+        setLoading(false);
+
+        return;
+      }
+
+      setCats(res.data);
+      setLoading(false);
     }
-    setCats(res.data);
   };
 
   useEffect(() => {
@@ -22,13 +29,12 @@ function Favorites() {
   }, []);
 
   const handleRemoveFromFavorites = async (id: string) => {
-    setLoading((p) => !p);
+    setLoading(true);
     const res = await removeFromFavorites(id);
-    console.log(res);
     if (res.data.message === 'SUCCESS') {
       const newArr = cats.filter((cat) => cat.id !== id);
       setCats(newArr);
-      setLoading((p) => !p);
+      setLoading(false);
     }
   };
 

@@ -6,6 +6,7 @@ import Modal from '@/components/Modal';
 import { fetchBreed } from '@/services/Cats/Cats';
 import useQuery from '@/utils/fetchQuery';
 import { paths } from '@/routing/Paths';
+import Spinner from '@/components/Spinner';
 
 const catListParameters = {
   has_breeds: 1,
@@ -15,13 +16,19 @@ const catListParameters = {
 function Breeds() {
   const [breeds, setBreeds] = useState<Cat[]>([]);
   const [selectedBreed, setSelectedBreed] = useState<Cat[] | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
   const query = useQuery();
   const id = query.get('id');
-  console.log(id);
 
   const handleFetch = async () => {
+    setLoading(true);
+
     const res = await fetchCatBreedList(catListParameters);
-    setBreeds(res.data);
+    if (res.data.length) {
+      setBreeds(res.data);
+      setLoading(false);
+    }
   };
 
   const handleSelectBreed = async (catId: string) => {
@@ -36,6 +43,8 @@ function Breeds() {
 
   return (
     <div className="text-2-5 mt-2-4 p-6-0">
+      <Spinner isLoading={loading} />
+
       <ul className="grid grid-cols-3 gap-x-1-6">
         {breeds.map((breed, index) => (
           <li key={breed.id + index}>
