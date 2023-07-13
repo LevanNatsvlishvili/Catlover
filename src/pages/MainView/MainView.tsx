@@ -18,7 +18,6 @@ function MainView() {
   const [selectedCat, setSelectedCat] = useState<Cat | null>(null);
   const [favoritesMsg, setFavoritesMsg] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-
   const query = useQuery();
   const id = query.get('id');
 
